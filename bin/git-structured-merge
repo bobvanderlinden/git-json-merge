@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+const { program, Option } = require("commander");
+const objectHash = require("object-hash");
+const { mergeFile, formats } = require("../lib/git-structured-merge");
+
+function collect(val, memo) {
+  memo.push(val);
+  return memo;
+}
+
+program
+  .arguments("<ours> <base> <theirs>")
+  .addOption(
+    new Option("--format <format>")
+      .choices(Object.keys(formats))
+      .default("json")
+  )
+  .addOption(
+    new Option(
+      "--identifier <identifier>",
+      "The key to use as an identifier in object-arrays."
+    )
+      .argParser(collect)
+      .default([])
+  )
+  .action(run)
+  .parse();
+
+async function run(ours, base, theirs, { format, identifier }) {
+  await mergeFile({
+    oursFile: ours,
+    baseFile: base,
+    theirsFile: theirs,
+    format: formats[format],
+    identifierFn: (object) => {
+      const identifierKey = identifier.find(
+        (identifierKey) => identifierKey in object
+      );
+      return identifierKey
+        ? `${identifierKey}:${object[identifierKey]}`
+        : objectHash(object);
+    },
+  });
+}

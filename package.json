@@ -22,7 +22,10 @@
     "git-json-merge": "bin/git-json-merge"
   },
   "dependencies": {
-    "detect-indent": "^6.0.0",
+    "@iarna/toml": "^2.2.5",
+    "commander": "^10.0.0",
+    "js-yaml": "^4.1.0",
+    "object-hash": "^3.0.0",
     "xdiff": "^0.2.11"
   },
   "devDependencies": {
